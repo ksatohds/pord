@@ -68,8 +68,8 @@ only and therefore answers a narrower, more demanding question.
 }
 \examples{
 set.seed(1)
-x <- sample(1:4, 96, TRUE, c(.05, .15, .35, .45))
-y <- pmax(1, pmin(4, x - rbinom(96, 1, .35)))
+x <- sample(1:4, 60, TRUE, c(.05, .15, .35, .45))
+y <- pmax(1, pmin(4, x - rbinom(60, 1, .35)))
 pord.test(x, y)
 
 # collapsing to two levels reproduces Fisher's exact test

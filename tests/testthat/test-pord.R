@@ -10,9 +10,18 @@ make_pair <- function(n = 120, K = 4, seed = 1, drop = 0.35) {
 }
 
 ## ---------------------------------------------------------------------
+## The exact null is a dynamic program over all tables with the observed
+## margins, and its cost climbs steeply in n: on one machine, n = 40 took
+## 0.08s, n = 80 took 7s and n = 120 took 92s.  The identities being checked
+## hold at every n, so the routine tests use a small n and run everywhere;
+## the large-n versions carry skip_on_cran(), which keeps CRAN's check short
+## without leaving these properties unverified there.
+N_FAST <- 40
+N_SLOW <- 120
+
 test_that("the closed-form moments equal the moments of the exact null", {
   for (sd in 1:4) {
-    d <- make_pair(seed = sd)
+    d <- make_pair(n = N_FAST, seed = sd)
     mo <- pord.moments(d$x, d$y, K = d$K)
     tt <- pord.test(d$x, d$y, K = d$K, method = "exact")
     v  <- seq_along(tt$null.pmf) - 1
@@ -23,8 +32,27 @@ test_that("the closed-form moments equal the moments of the exact null", {
   }
 })
 
+test_that("the closed-form moments still match at a larger sample", {
+  skip_on_cran()
+  d <- make_pair(n = N_SLOW, seed = 1)
+  mo <- pord.moments(d$x, d$y, K = d$K)
+  tt <- pord.test(d$x, d$y, K = d$K, method = "exact")
+  v  <- seq_along(tt$null.pmf) - 1
+  mu <- sum(v * tt$null.pmf)
+  expect_equal(mo$mean, mu, tolerance = 1e-9)
+  expect_equal(mo$sd, sqrt(sum((v - mu)^2 * tt$null.pmf)), tolerance = 1e-9)
+})
+
 test_that("the exact null distribution is a proper distribution", {
-  d <- make_pair(seed = 7)
+  d <- make_pair(n = N_FAST, seed = 7)
+  tt <- pord.test(d$x, d$y, K = d$K, method = "exact")
+  expect_equal(sum(tt$null.pmf), 1, tolerance = 1e-10)
+  expect_true(all(tt$null.pmf >= -1e-12))
+})
+
+test_that("the exact null is still a proper distribution at a larger sample", {
+  skip_on_cran()
+  d <- make_pair(n = N_SLOW, seed = 7)
   tt <- pord.test(d$x, d$y, K = d$K, method = "exact")
   expect_equal(sum(tt$null.pmf), 1, tolerance = 1e-10)
   expect_true(all(tt$null.pmf >= -1e-12))
@@ -44,13 +72,24 @@ test_that("with two scale points the test reduces to Fisher's exact test", {
 
 ## ---------------------------------------------------------------------
 test_that("exact, permutation and normal agree well enough", {
+  d <- make_pair(n = N_FAST, seed = 3)
+  e <- pord.test(d$x, d$y, K = d$K, method = "exact")$p.value
+  set.seed(11)
+  p <- pord.test(d$x, d$y, K = d$K, method = "permutation", B = 5000)$p.value
+  n <- pord.test(d$x, d$y, K = d$K, method = "normal")$p.value
+  expect_equal(p, e, tolerance = 0.03)          # Monte Carlo error, B = 5000
+  expect_gt(n / e, 0.5); expect_lt(n / e, 2)    # continuity-corrected normal
+})
+
+test_that("the three methods still agree at the sample size a user would have", {
+  skip_on_cran()
   d <- make_pair(n = 150, seed = 3)
   e <- pord.test(d$x, d$y, K = d$K, method = "exact")$p.value
   set.seed(11)
   p <- pord.test(d$x, d$y, K = d$K, method = "permutation", B = 20000)$p.value
   n <- pord.test(d$x, d$y, K = d$K, method = "normal")$p.value
-  expect_equal(p, e, tolerance = 0.02)          # Monte Carlo error
-  expect_gt(n / e, 0.5); expect_lt(n / e, 2)    # continuity-corrected normal
+  expect_equal(p, e, tolerance = 0.02)
+  expect_gt(n / e, 0.5); expect_lt(n / e, 2)
 })
 
 test_that("the continuity correction matters", {
