@@ -1,0 +1,14 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rcheck
+*.tar.gz
+docs/
+# 論文データ・論文の数値を含むものは公開しない
+# reproduce/ には検証スクリプトと実行ログがあり、いずれも未公表の学位論文の
+# 数値を期待値として含むため、リポジトリには入れない。
+reproduce/
+*.csv
+*.tsv
+*.xlsx
