@@ -1,3 +1,25 @@
+# pord 0.2.2 (2026-08-19)
+
+## Terminology, finished
+
+0.2.1 corrected the help page for `pord.sign()` but left the older wording in
+place elsewhere.  No computed value changes.
+
+- The `print()` banner said "exact test of symmetry"; it now says "exact test
+  of directional balance".
+- The README still introduced the null as **symmetry**; it now introduces
+  directional balance, and states separately that table symmetry implies it
+  but is strictly stronger, with the counterexample.
+- The file-header comment claimed the sign test conditions on the pair totals
+  `n_ij + n_ji`.  That is the conditioning of an exact symmetry test (Bowker).
+  The sign test conditions on the **number of discordant pairs**, which is why
+  directional balance alone suffices for the binomial.  Corrected, and the
+  distinction between the two conditionings is now written down.
+- The ceiling argument ran through "symmetry implies equal margins".  It is
+  more direct, and correct under the weaker null, to say: if `x` is at the top
+  then `y > x` cannot occur, so balance forces `P(y < x) = 0` and any
+  shortfall at all is evidence against it.
+
 # pord 0.2.1 (2026-08-19)
 
 ## Wording and test coverage

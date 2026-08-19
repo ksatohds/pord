@@ -1,7 +1,7 @@
 Package: pord
 Type: Package
 Title: Exact Conditional Tests for Paired Ordinal Data on a Square Table
-Version: 0.2.1
+Version: 0.2.2
 Date: 2026-08-19
 Authors@R:
     person("Kenichi", "Satoh",

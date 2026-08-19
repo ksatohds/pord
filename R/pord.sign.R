@@ -4,18 +4,26 @@
 # The primary test (pord.test) has independence as its null.  Its lower tail
 # does NOT answer "is y falling short of x": under that null D = n - T, so a
 # large D simply means negative association.  The natural null for the
-# shortfall question is symmetry, P(y < x) = P(y > x).  Conditioning on the
-# pair totals n_ij + n_ji removes the diagonal probabilities (which are free
-# parameters under symmetry), and the lower-triangle count is then binomial
-# with probability one half.  That is the sign test: discarding ties is a
+# shortfall question is directional balance, P(y < x) = P(y > x).  Conditioning
+# on the NUMBER OF DISCORDANT PAIRS leaves each of them equally likely to fall
+# either way, so the lower-triangle count is binomial with probability one half
+# and the diagonal drops out.  That is the sign test: discarding ties is a
 # consequence of the conditioning, not an arbitrary choice.
 #
-# A ceiling in x is NOT a bias here.  Symmetry implies equal margins, so a
-# concentration of x at the top with y below it is exactly the asymmetry the
-# test is meant to detect.  (Versions up to 0.1.0 offered a `conditional`
-# variant restricting to 1 < x < K; that selection is asymmetric in (x, y),
-# so under symmetry the discordant probability is no longer one half and the
-# reported p-values were wrong.  The argument has been removed.)
+# Table symmetry, pi_ij = pi_ji, implies that null but is strictly stronger,
+# and testing it is a different exercise: it conditions on each pair total
+# n_ij + n_ji separately (Bowker).  pord.sign pools the off-diagonal cells into
+# two totals, so it cannot see a table where one pair leans one way and another
+# leans back -- see the help page for a worked case.
+#
+# A ceiling in x is NOT a bias here.  If x sits at the top of the scale then
+# y > x cannot occur, and the null P(y < x) = P(y > x) then forces P(y < x) = 0
+# as well, so any shortfall at all is evidence against it.  A concentration of
+# x at the top with y below it is the imbalance the test is meant to detect.
+# (Versions up to 0.1.0 offered a `conditional` variant restricting to
+# 1 < x < K; that selection is asymmetric in (x, y), so under the null the
+# discordant probability is no longer one half and the reported p-values were
+# wrong.  The argument has been removed.)
 
 #' @title Sign test for paired ordinal shortfall
 #' @description
@@ -34,12 +42,13 @@
 #' symmetry test when symmetry itself is the question; \code{pord.sign} answers
 #' the directional one.
 #'
-#' A ceiling in \code{x} does not bias this test.  The null of symmetry
-#' implies equal margins for \eqn{x} and \eqn{y}; when \eqn{x} piles up at the
-#' top of the scale while \eqn{y} does not, that is the asymmetry being
-#' tested, not an artefact.  A significant result on (nearly) every item is
-#' therefore a finding; to rank items or domains by shortfall, use
-#' [pord.compare()] or a heterogeneity test across items.
+#' A ceiling in \code{x} does not bias this test.  If \eqn{x} sits at the top
+#' of the scale then \eqn{y > x} cannot occur, and directional balance then
+#' forces \eqn{P(Y < X) = 0} as well, so any shortfall at all is evidence
+#' against the null.  When \eqn{x} piles up at the top while \eqn{y} does not,
+#' that is the imbalance being tested, not an artefact.  A significant result
+#' on (nearly) every item is therefore a finding; to rank items or domains by
+#' shortfall, use [pord.compare()] or a heterogeneity test across items.
 #'
 #' The sign test is the method recommended for paired ordinal data by
 #' Svensson (2001), who notes that the Wilcoxon signed-rank test is
@@ -86,7 +95,7 @@ pord.sign <- function(x, y = NULL, K = NULL,
 
 #' @export
 print.pord.sign <- function(x, ...) {
-  cat("\n\tSign test for paired ordinal shortfall (exact test of symmetry)\n\n")
+  cat("\n\tSign test for paired ordinal shortfall (exact test of directional balance)\n\n")
   cat(sprintf("n = %d\n", x$n))
   cat(sprintf("y < x: %d, y == x: %d, y > x: %d\n", x$below, x$tied, x$above))
   cat(sprintf("falling short: %.1f%% of all, %.1f%% of discordant pairs\n",

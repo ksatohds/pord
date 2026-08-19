@@ -69,15 +69,23 @@ Note that this is not the terminology of `stats::friedman.test()`, where
 whether `y` falls short of `x`: under that null the shortfall count is `n - T`,
 so a large value simply means negative association.
 
-The natural null for the shortfall question is **symmetry**,
-`P(y < x) = P(y > x)`. Conditioning on the off-diagonal pair totals removes the
-diagonal (ties drop out as a consequence of the conditioning, not by choice) and
-leaves a binomial — the sign test, provided by `pord.sign()`.
+The natural null for the shortfall question is **directional balance**,
+`P(y < x) = P(y > x)`. Conditioning on the number of discordant pairs leaves a
+binomial with probability one half — the sign test, provided by `pord.sign()`.
+Ties drop out as a consequence of the conditioning, not by choice.
 
-A ceiling in `x` does not bias the sign test: symmetry implies equal margins,
-so `x` piling up at the top while `y` stays below is the asymmetry being
-tested. A significant result on (nearly) every item is a finding, not an
-artefact; to *rank* items or domains by shortfall, use `pord.compare()`.
+Table symmetry (`π_ij = π_ji`) implies this null but is strictly stronger, and
+`pord.sign()` does not test it: pooling every off-diagonal cell into two totals
+makes it blind to a table where one pair leans one way and another leans back.
+On `n_12 = 30, n_21 = 0, n_34 = 0, n_43 = 30` it returns `p = 1` while Bowker's
+test of symmetry gives `p < 1e-13`. Use a Bowker or exact conditional symmetry
+test when symmetry itself is the question.
+
+A ceiling in `x` does not bias the sign test: if `x` is at the top of the scale
+then `y > x` cannot occur, and directional balance then forces `P(y < x) = 0`
+too, so any shortfall is evidence against the null. A significant result on
+(nearly) every item is a finding, not an artefact; to *rank* items or domains
+by shortfall, use `pord.compare()`.
 (Versions up to 0.1.0 offered `conditional = TRUE`, restricting to
 `1 < x < K`. That selection is asymmetric in `(x, y)`, so under symmetry the
 discordant probability is not one half and the p-values were wrong. The

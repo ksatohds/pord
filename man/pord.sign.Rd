@@ -44,12 +44,13 @@ of symmetry gives \eqn{p < 10^{-13}}.  Use a Bowker or exact conditional
 symmetry test when symmetry itself is the question; \code{pord.sign} answers
 the directional one.
 
-A ceiling in \code{x} does not bias this test.  The null of symmetry
-implies equal margins for \eqn{x} and \eqn{y}; when \eqn{x} piles up at the
-top of the scale while \eqn{y} does not, that is the asymmetry being
-tested, not an artefact.  A significant result on (nearly) every item is
-therefore a finding; to rank items or domains by shortfall, use
-\code{\link[=pord.compare]{pord.compare()}} or a heterogeneity test across items.
+A ceiling in \code{x} does not bias this test.  If \eqn{x} sits at the top
+of the scale then \eqn{y > x} cannot occur, and directional balance then
+forces \eqn{P(Y < X) = 0} as well, so any shortfall at all is evidence
+against the null.  When \eqn{x} piles up at the top while \eqn{y} does not,
+that is the imbalance being tested, not an artefact.  A significant result
+on (nearly) every item is therefore a finding; to rank items or domains by
+shortfall, use \code{\link[=pord.compare]{pord.compare()}} or a heterogeneity test across items.
 
 The sign test is the method recommended for paired ordinal data by
 Svensson (2001), who notes that the Wilcoxon signed-rank test is
