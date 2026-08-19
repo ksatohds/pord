@@ -124,18 +124,27 @@ test_that("pord.table splits the square table into three regions", {
 })
 
 ## ---------------------------------------------------------------------
-test_that("the sign test drops ties and the conditional variant drops both ends", {
+test_that("the sign test drops ties and matches the classical binomial", {
   d <- make_pair(seed = 6)
   s1 <- pord.sign(d$x, d$y, K = d$K)
   expect_equal(s1$below + s1$tied + s1$above, length(d$x))
-  s2 <- pord.sign(d$x, d$y, K = d$K, conditional = TRUE)
-  expect_equal(s2$n, sum(d$x > 1 & d$x < d$K))
-  expect_lte(s2$n, s1$n)
-  # the conditional variant is less biased when the ceiling is heavy
-  set.seed(21)
-  x <- rep(4L, 100); y <- sample(1:4, 100, TRUE)
-  expect_lt(pord.sign(x, y, K = 4)$p.value, 1e-10)   # naive: rejects trivially
-  expect_error(pord.sign(x, y, K = 4, conditional = TRUE))  # nothing left
+  ref <- stats::binom.test(s1$below, s1$below + s1$above, 0.5,
+                           alternative = "greater")$p.value
+  expect_equal(s1$p.value, ref, tolerance = 1e-12)
+})
+
+test_that("the sign test holds its level under symmetry, ceiling included", {
+  # X, Y iid from a top-heavy distribution: the joint is symmetric, so the
+  # test must NOT reject at more than its nominal level.  This is the case
+  # that the removed `conditional` variant got wrong (its selection on
+  # 1 < x < K made the discordant probability 0.218, not 0.5).
+  set.seed(22)
+  pr <- c(.05, .15, .35, .45)
+  rej <- mean(replicate(2000, {
+    x <- sample(1:4, 60, TRUE, pr); y <- sample(1:4, 60, TRUE, pr)
+    pord.sign(x, y, K = 4)$p.value < 0.05
+  }))
+  expect_lt(rej, 0.07)   # nominal 5% plus Monte Carlo slack
 })
 
 ## ---------------------------------------------------------------------
@@ -178,7 +187,7 @@ test_that("pord.items adjusts across items and orders by excess", {
   X <- matrix(sample(1:4, 60 * 4, TRUE, prob = 1:4), 60, 4)
   Y <- pmax(pmin(X - matrix(stats::rbinom(60 * 4, 1, .4), 60, 4), 4), 1)
   colnames(X) <- colnames(Y) <- paste0("Q", 1:4)
-  out <- pord.items(X, Y, sign = TRUE, conditional = TRUE)
+  out <- pord.items(X, Y, sign = TRUE)
   expect_equal(nrow(out), 4L)
   expect_true(all(out$p.adjusted >= out$p.value))
   expect_true(!is.unsorted(rev(out$excess)))

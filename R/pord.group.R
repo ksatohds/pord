@@ -169,7 +169,6 @@ print.pord.group <- function(x, ...) {
 #' @param Y Matrix or data frame of \code{y} ratings, same shape as \code{X}.
 #' @param K Number of scale points.  Taken from the data when \code{NULL}.
 #' @param sign Also run the sign test for \eqn{y < x} on each item.
-#' @param conditional Passed to [pord.sign()].
 #' @param p.adjust.method Method passed to [stats::p.adjust()].
 #' @param ... Passed to [pord.test()], e.g. \code{method} or \code{B}.
 #'
@@ -182,9 +181,9 @@ print.pord.group <- function(x, ...) {
 #' set.seed(1)
 #' X <- matrix(sample(1:4, 60 * 4, TRUE, c(.05, .15, .35, .45)), 60, 4)
 #' Y <- pmax(pmin(X - matrix(rbinom(60 * 4, 1, .4), 60, 4), 4), 1)
-#' pord.items(X, Y, sign = TRUE, conditional = TRUE)
+#' pord.items(X, Y, sign = TRUE)
 #' @export
-pord.items <- function(X, Y, K = NULL, sign = FALSE, conditional = TRUE,
+pord.items <- function(X, Y, K = NULL, sign = FALSE,
                        p.adjust.method = "holm", ...) {
   X <- as.matrix(X); Y <- as.matrix(Y)
   if (!identical(dim(X), dim(Y))) stop("'X' and 'Y' must have the same shape")
@@ -197,7 +196,7 @@ pord.items <- function(X, Y, K = NULL, sign = FALSE, conditional = TRUE,
                       z = tt$z, p.value = tt$p.value, method = tt$method,
                       stringsAsFactors = FALSE)
     if (sign) {
-      ss <- pord.sign(X[, j], Y[, j], K = K, conditional = conditional)
+      ss <- pord.sign(X[, j], Y[, j], K = K)
       row$prop.ceiling <- ss$prop.ceiling
       row$sign.n <- ss$n
       row$sign.below <- ss$below; row$sign.tied <- ss$tied; row$sign.above <- ss$above

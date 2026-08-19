@@ -36,6 +36,15 @@ With \eqn{p_k = P(x = k)}, \eqn{q_l = P(y = l)},
 Because both moments are functions of the margins alone, \strong{the null
 distribution is not shared between items with different margins}.
 }
+\details{
+The closed-form mean and variance follow from the finite-population
+(permutation) variance formula for a sum scored over pairs, obtained by
+double centering; the general framework is that of Wald and Wolfowitz
+(1944), Hoeffding (1951) and Strasser and Weber (1999).  The formula
+itself is derived in this package rather than taken from a published
+source, and is verified against the exact null distribution in the
+package tests.
+}
 \examples{
 set.seed(1)
 x <- sample(1:4, 96, TRUE); y <- sample(1:4, 96, TRUE)

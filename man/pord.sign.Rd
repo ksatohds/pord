@@ -8,7 +8,6 @@ pord.sign(
   x,
   y = NULL,
   K = NULL,
-  conditional = FALSE,
   alternative = c("greater", "less", "two.sided")
 )
 }
@@ -19,9 +18,6 @@ pord.sign(
 \item{y}{Integer vector of the same length as \code{x}.}
 
 \item{K}{Number of scale points.  Taken from the data when \code{NULL}.}
-
-\item{conditional}{Restrict to respondents with \code{1 < x < K}, removing
-the ceiling and floor bias.}
 
 \item{alternative}{\code{"greater"} (the default; \eqn{y} falls short more
 often than it exceeds), \code{"less"}, or \code{"two.sided"}.}
@@ -40,10 +36,12 @@ symmetry: conditioning on the off-diagonal pair totals leaves a binomial
 distribution, so the diagonal (ties) drops out and the test is the classical
 sign test.
 
-When \code{x} sits at the top of the scale, \eqn{y > x} is impossible, so the
-unconditional test is biased towards rejection whatever \eqn{y} is.  Set
-\code{conditional = TRUE} to restrict to respondents whose \code{x} lies
-strictly inside the scale, for whom both directions remain possible.
+A ceiling in \code{x} does not bias this test.  The null of symmetry
+implies equal margins for \eqn{x} and \eqn{y}; when \eqn{x} piles up at the
+top of the scale while \eqn{y} does not, that is the asymmetry being
+tested, not an artefact.  A significant result on (nearly) every item is
+therefore a finding; to rank items or domains by shortfall, use
+\code{\link[=pord.compare]{pord.compare()}} or a heterogeneity test across items.
 
 The sign test is the method recommended for paired ordinal data by
 Svensson (2001), who notes that the Wilcoxon signed-rank test is
@@ -53,8 +51,7 @@ Svensson (2001), who notes that the Wilcoxon signed-rank test is
 set.seed(1)
 x <- sample(1:4, 96, TRUE, c(.05, .15, .35, .45))
 y <- pmax(1, pmin(4, x - rbinom(96, 1, .35)))
-pord.sign(x, y)                      # naive: inflated by the ceiling
-pord.sign(x, y, conditional = TRUE)  # restricted to 1 < x < K
+pord.sign(x, y)
 }
 \references{
 Svensson, E. (2001). Guidelines to statistical evaluation of data from rating

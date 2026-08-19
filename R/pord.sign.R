@@ -10,10 +10,12 @@
 # with probability one half.  That is the sign test: discarding ties is a
 # consequence of the conditioning, not an arbitrary choice.
 #
-# Ceiling bias: when x is at the top of the scale, y > x cannot occur, so the
-# naive sign test is pushed towards "falls short" regardless of y.  The
-# conditional variant restricts to respondents whose x leaves room in both
-# directions.
+# A ceiling in x is NOT a bias here.  Symmetry implies equal margins, so a
+# concentration of x at the top with y below it is exactly the asymmetry the
+# test is meant to detect.  (Versions up to 0.1.0 offered a `conditional`
+# variant restricting to 1 < x < K; that selection is asymmetric in (x, y),
+# so under symmetry the discordant probability is no longer one half and the
+# reported p-values were wrong.  The argument has been removed.)
 
 #' @title Sign test for paired ordinal shortfall
 #' @description
@@ -24,10 +26,12 @@
 #' distribution, so the diagonal (ties) drops out and the test is the classical
 #' sign test.
 #'
-#' When \code{x} sits at the top of the scale, \eqn{y > x} is impossible, so the
-#' unconditional test is biased towards rejection whatever \eqn{y} is.  Set
-#' \code{conditional = TRUE} to restrict to respondents whose \code{x} lies
-#' strictly inside the scale, for whom both directions remain possible.
+#' A ceiling in \code{x} does not bias this test.  The null of symmetry
+#' implies equal margins for \eqn{x} and \eqn{y}; when \eqn{x} piles up at the
+#' top of the scale while \eqn{y} does not, that is the asymmetry being
+#' tested, not an artefact.  A significant result on (nearly) every item is
+#' therefore a finding; to rank items or domains by shortfall, use
+#' [pord.compare()] or a heterogeneity test across items.
 #'
 #' The sign test is the method recommended for paired ordinal data by
 #' Svensson (2001), who notes that the Wilcoxon signed-rank test is
@@ -37,8 +41,6 @@
 #'   (in which case \code{y} is omitted).
 #' @param y Integer vector of the same length as \code{x}.
 #' @param K Number of scale points.  Taken from the data when \code{NULL}.
-#' @param conditional Restrict to respondents with \code{1 < x < K}, removing
-#'   the ceiling and floor bias.
 #' @param alternative \code{"greater"} (the default; \eqn{y} falls short more
 #'   often than it exceeds), \code{"less"}, or \code{"two.sided"}.
 #'
@@ -55,26 +57,21 @@
 #' set.seed(1)
 #' x <- sample(1:4, 96, TRUE, c(.05, .15, .35, .45))
 #' y <- pmax(1, pmin(4, x - rbinom(96, 1, .35)))
-#' pord.sign(x, y)                      # naive: inflated by the ceiling
-#' pord.sign(x, y, conditional = TRUE)  # restricted to 1 < x < K
+#' pord.sign(x, y)
 #' @export
-pord.sign <- function(x, y = NULL, K = NULL, conditional = FALSE,
+pord.sign <- function(x, y = NULL, K = NULL,
                       alternative = c("greater", "less", "two.sided")) {
   alternative <- match.arg(alternative)
   d <- .pord.pair(x, y, K)
-  keep <- if (conditional) d$x > 1 & d$x < d$K else rep(TRUE, d$n)
-  if (!any(keep)) stop("no respondent has x strictly inside the scale")
-  xi <- d$x[keep]; yi <- d$y[keep]
-  lo <- sum(yi < xi); ti <- sum(yi == xi); hi <- sum(yi > xi)
+  lo <- sum(d$y < d$x); ti <- sum(d$y == d$x); hi <- sum(d$y > d$x)
   bt <- if (lo + hi > 0)
     stats::binom.test(lo, lo + hi, 0.5, alternative = alternative) else
       list(p.value = NA_real_)
   structure(list(
-    below = lo, tied = ti, above = hi, n = length(xi), n.all = d$n,
-    prop.below = lo / length(xi),
+    below = lo, tied = ti, above = hi, n = d$n,
+    prop.below = lo / d$n,
     prop.discordant = if (lo + hi > 0) lo / (lo + hi) else NA_real_,
-    p.value = bt$p.value, alternative = alternative,
-    conditional = conditional, K = d$K,
+    p.value = bt$p.value, alternative = alternative, K = d$K,
     prop.ceiling = mean(d$x == d$K), prop.floor = mean(d$x == 1)),
     class = "pord.sign")
 }
@@ -82,16 +79,11 @@ pord.sign <- function(x, y = NULL, K = NULL, conditional = FALSE,
 #' @export
 print.pord.sign <- function(x, ...) {
   cat("\n\tSign test for paired ordinal shortfall (exact test of symmetry)\n\n")
-  if (x$conditional)
-    cat(sprintf("restricted to 1 < x < %d: n = %d of %d\n", x$K, x$n, x$n.all))
-  else
-    cat(sprintf("n = %d\n", x$n))
+  cat(sprintf("n = %d\n", x$n))
   cat(sprintf("y < x: %d, y == x: %d, y > x: %d\n", x$below, x$tied, x$above))
   cat(sprintf("falling short: %.1f%% of all, %.1f%% of discordant pairs\n",
               100 * x$prop.below, 100 * x$prop.discordant))
-  cat(sprintf("x at the ceiling: %.1f%%%s\n", 100 * x$prop.ceiling,
-              if (!x$conditional && x$prop.ceiling > 0.3)
-                "  <- large; consider conditional = TRUE" else ""))
+  cat(sprintf("x at the ceiling: %.1f%%\n", 100 * x$prop.ceiling))
   cat(sprintf("alternative: %s\np-value = %s\n\n", x$alternative,
               format.pval(x$p.value)))
   invisible(x)

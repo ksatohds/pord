@@ -208,6 +208,14 @@ pord.table <- function(x, y = NULL, K = NULL) {
 #' @return A list with \code{theta} (the null mean of \eqn{T/n}, i.e. the value
 #'   expected under independence), \code{mean} and \code{sd} of \eqn{T} in
 #'   counts, and \code{n}.
+#' @details
+#' The closed-form mean and variance follow from the finite-population
+#' (permutation) variance formula for a sum scored over pairs, obtained by
+#' double centering; the general framework is that of Wald and Wolfowitz
+#' (1944), Hoeffding (1951) and Strasser and Weber (1999).  The formula
+#' itself is derived in this package rather than taken from a published
+#' source, and is verified against the exact null distribution in the
+#' package tests.
 #' @references
 #' Wald, A. and Wolfowitz, J. (1944). Statistical tests based on permutations of
 #'   the observations. \emph{Annals of Mathematical Statistics} \strong{15}, 358--372.
@@ -254,6 +262,11 @@ pord.moments <- function(x, y = NULL, K = NULL) {
 #' independence in any direction, whereas \code{pord.test} counts one direction
 #' only and therefore answers a narrower, more demanding question.
 #'
+#' The construction -- an exact conditional test of independence that orders
+#' the tables with fixed margins by a statistic chosen for the question at
+#' hand -- follows Agresti and Wackerly (1977); exact conditional inference
+#' for ordered categories is treated by Agresti, Mehta and Patel (1990).
+#'
 #' @param x Integer vector of ratings in \code{1..K}, or a square table
 #'   (in which case \code{y} is omitted).
 #' @param y Integer vector of the same length as \code{x}.
@@ -282,8 +295,20 @@ pord.moments <- function(x, y = NULL, K = NULL) {
 #'   actually used, and -- for \code{method = "exact"} -- the complete null
 #'   probability mass function.
 #' @references
+#' Agresti, A. and Wackerly, D. (1977). Some exact conditional tests of
+#'   independence for r x c cross-classification tables.
+#'   \emph{Psychometrika} \strong{42}, 111--125.
+#'
+#' Agresti, A., Mehta, C. R. and Patel, N. R. (1990). Exact inference for
+#'   contingency tables with ordered categories. \emph{Journal of the American
+#'   Statistical Association} \strong{85}, 453--458.
+#'
 #' Fisher, R. A. (1935). The logic of inductive inference.
 #'   \emph{Journal of the Royal Statistical Society} \strong{98}, 39--82.
+#'
+#' Agresti, A., Wackerly, D. and Boyett, J. M. (1979). Exact conditional tests
+#'   for cross-classifications: approximation of attained significance levels.
+#'   \emph{Psychometrika} \strong{44}, 75--83.
 #'
 #' Phipson, B. and Smyth, G. K. (2010). Permutation p-values should never be
 #'   zero. \emph{Statistical Applications in Genetics and Molecular Biology}

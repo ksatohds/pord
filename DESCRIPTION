@@ -1,8 +1,8 @@
 Package: pord
 Type: Package
 Title: Exact Conditional Tests for Paired Ordinal Data on a Square Table
-Version: 0.1.0
-Date: 2026-08-16
+Version: 0.2.0
+Date: 2026-08-19
 Authors@R:
     person("Kenichi", "Satoh",
            email = "kenichi-satoh@biwako.shiga-u.ac.jp",
@@ -22,9 +22,8 @@ Description: Exact conditional tests for paired ordinal data recorded on the
     distribution is obtained exactly by dynamic programming, with permutation
     and closed-form normal approximations available as alternatives; the null
     mean and variance have closed forms depending only on the two margins.
-    Companion functions provide the sign test for y < x (with a conditional
-    variant that removes the ceiling bias), group comparison by label
-    permutation, and diagnostics for how the margins govern power.
+    Companion functions provide the sign test for y < x, group comparison
+    by label permutation, and diagnostics for how the margins govern power.
 License: MIT + file LICENSE
 Imports:
     stats,

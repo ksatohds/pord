@@ -65,6 +65,11 @@ statistic: the Fisher-Freeman-Halton extension of Fisher's test to K x K
 tables uses the probability of the table itself and detects departures from
 independence in any direction, whereas \code{pord.test} counts one direction
 only and therefore answers a narrower, more demanding question.
+
+The construction -- an exact conditional test of independence that orders
+the tables with fixed margins by a statistic chosen for the question at
+hand -- follows Agresti and Wackerly (1977); exact conditional inference
+for ordered categories is treated by Agresti, Mehta and Patel (1990).
 }
 \examples{
 set.seed(1)
@@ -77,8 +82,20 @@ x2 <- as.integer(x == 4); y2 <- as.integer(y == 4)
 pord.test(x2 + 1L, y2 + 1L)$p.value
 }
 \references{
+Agresti, A. and Wackerly, D. (1977). Some exact conditional tests of
+independence for r x c cross-classification tables.
+\emph{Psychometrika} \strong{42}, 111--125.
+
+Agresti, A., Mehta, C. R. and Patel, N. R. (1990). Exact inference for
+contingency tables with ordered categories. \emph{Journal of the American
+Statistical Association} \strong{85}, 453--458.
+
 Fisher, R. A. (1935). The logic of inductive inference.
 \emph{Journal of the Royal Statistical Society} \strong{98}, 39--82.
+
+Agresti, A., Wackerly, D. and Boyett, J. M. (1979). Exact conditional tests
+for cross-classifications: approximation of attained significance levels.
+\emph{Psychometrika} \strong{44}, 75--83.
 
 Phipson, B. and Smyth, G. K. (2010). Permutation p-values should never be
 zero. \emph{Statistical Applications in Genetics and Molecular Biology}

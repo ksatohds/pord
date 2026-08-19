@@ -4,15 +4,7 @@
 \alias{pord.items}
 \title{Apply the paired ordinal tests across many items}
 \usage{
-pord.items(
-  X,
-  Y,
-  K = NULL,
-  sign = FALSE,
-  conditional = TRUE,
-  p.adjust.method = "holm",
-  ...
-)
+pord.items(X, Y, K = NULL, sign = FALSE, p.adjust.method = "holm", ...)
 }
 \arguments{
 \item{X}{Matrix or data frame of \code{x} ratings, \strong{respondents in rows and
@@ -23,8 +15,6 @@ items in columns}.}
 \item{K}{Number of scale points.  Taken from the data when \code{NULL}.}
 
 \item{sign}{Also run the sign test for \eqn{y < x} on each item.}
-
-\item{conditional}{Passed to \code{\link[=pord.sign]{pord.sign()}}.}
 
 \item{p.adjust.method}{Method passed to \code{\link[stats:p.adjust]{stats::p.adjust()}}.}
 
@@ -44,7 +34,7 @@ column of a pair of matrices, and adjusts for multiplicity across items.
 set.seed(1)
 X <- matrix(sample(1:4, 60 * 4, TRUE, c(.05, .15, .35, .45)), 60, 4)
 Y <- pmax(pmin(X - matrix(rbinom(60 * 4, 1, .4), 60, 4), 4), 1)
-pord.items(X, Y, sign = TRUE, conditional = TRUE)
+pord.items(X, Y, sign = TRUE)
 }
 \seealso{
 \code{\link[=pord.test]{pord.test()}}, \code{\link[=pord.sign]{pord.sign()}}, \code{\link[=pord.group]{pord.group()}}

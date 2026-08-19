@@ -45,7 +45,7 @@ x <- sample(1:4, 96, TRUE, c(.05, .15, .35, .45))   # expectation
 y <- pmax(1, pmin(4, x - rbinom(96, 1, .35)))       # achievement
 
 pord.test(x, y)            # does achievement reach expectation?
-pord.sign(x, y, conditional = TRUE)   # where does it fall short?
+pord.sign(x, y)            # does achievement fall short of expectation?
 pord.table(x, y)           # the 4 x 4 table split into three regions
 ```
 
@@ -74,9 +74,14 @@ The natural null for the shortfall question is **symmetry**,
 diagonal (ties drop out as a consequence of the conditioning, not by choice) and
 leaves a binomial — the sign test, provided by `pord.sign()`.
 
-When `x` sits at an end of the scale one direction is impossible, so the
-unconditional sign test is biased. `conditional = TRUE` restricts to respondents
-with `1 < x < K`, for whom both directions remain available.
+A ceiling in `x` does not bias the sign test: symmetry implies equal margins,
+so `x` piling up at the top while `y` stays below is the asymmetry being
+tested. A significant result on (nearly) every item is a finding, not an
+artefact; to *rank* items or domains by shortfall, use `pord.compare()`.
+(Versions up to 0.1.0 offered `conditional = TRUE`, restricting to
+`1 < x < K`. That selection is asymmetric in `(x, y)`, so under symmetry the
+discordant probability is not one half and the p-values were wrong. The
+argument was removed in 0.2.0.)
 
 ## Choosing a method
 
@@ -106,8 +111,20 @@ a margin-preserving transfer that increases concordance can decrease
 `P(y >= x)`. The test therefore targets a specific direction and should not be
 described as a test for positive dependence.
 
+## Related methods
+
+The null here is **independence**. For the different question of whether the
+*margins* of y sit below those of x (marginal homogeneity against a stochastic
+ordering), see Stuart (1955) and the one-sided ordinal test of Agresti (1983);
+those tests condition differently and are not implemented in this package.
+
 ## References
 
+- Agresti, A. & Wackerly, D. (1977). Some exact conditional tests of independence for r × c cross-classification tables. *Psychometrika* **42**, 111–125.
+- Agresti, A., Wackerly, D. & Boyett, J. M. (1979). Exact conditional tests for cross-classifications: approximation of attained significance levels. *Psychometrika* **44**, 75–83.
+- Agresti, A. (1983). Testing marginal homogeneity for ordinal categorical variables. *Biometrics* **39**, 505–510.
+- Agresti, A., Mehta, C. R. & Patel, N. R. (1990). Exact inference for contingency tables with ordered categories. *JASA* **85**, 453–458.
+- Stuart, A. (1955). A test for homogeneity of the marginal distributions in a two-way classification. *Biometrika* **42**, 412–416.
 - Fisher, R. A. (1935). The logic of inductive inference. *JRSS* **98**, 39–82.
 - Wald, A. & Wolfowitz, J. (1944). Statistical tests based on permutations of the observations. *Ann. Math. Statist.* **15**, 358–372.
 - Hoeffding, W. (1951). A combinatorial central limit theorem. *Ann. Math. Statist.* **22**, 558–566.
