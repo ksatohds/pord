@@ -128,7 +128,9 @@ print.pord.sign <- function(x, ...) {
 #' @param p.adjust.method Method passed to [stats::p.adjust()].
 #'
 #' @return A list of class \code{"pord.compare"} with the domain-level
-#'   proportions and mean ranks, the Friedman test and Kendall's W, and a data
+#'   proportions and mean ranks, the Friedman test and Kendall's W (defined as
+#'   \eqn{\chi^2 / (n (G - 1))}, so that it shares the tie correction applied
+#'   by [stats::friedman.test()]), and a data
 #'   frame of all pairwise sign tests.  Only respondents with complete data on
 #'   every item are used, since the comparison is within respondents.
 #' @seealso [pord.sign()], [pord.items()]
@@ -154,7 +156,12 @@ pord.compare <- function(X, Y, domain, p.adjust.method = "holm") {
   rk <- t(apply(Z, 1, rank))
   fr <- stats::friedman.test(Z)
   G <- length(lev)
-  W <- 12 * sum((colSums(rk) - mean(colSums(rk)))^2) / (n^2 * (G^3 - G))
+  ## Kendall's W must use the SAME tie handling as the chi-squared it
+  ## accompanies.  stats::friedman.test() already applies the tie correction,
+  ## so W is taken as chi2 / (n (G - 1)); this equals the tie-corrected
+  ## 12 S / (n^2 (G^3 - G) - n T).  Up to 0.2.0 an uncorrected W was returned
+  ## next to the corrected chi-squared, so the two did not match.
+  W <- as.numeric(fr$statistic) / (n * (G - 1))
   pr <- utils::combn(G, 2)
   res <- do.call(rbind, lapply(seq_len(ncol(pr)), function(k) {
     a <- lev[pr[1, k]]; b <- lev[pr[2, k]]

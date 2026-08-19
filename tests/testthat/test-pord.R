@@ -164,6 +164,30 @@ test_that("the sign test has power against a real downward shift", {
 })
 
 ## ---------------------------------------------------------------------
+test_that("Kendall's W shares the tie correction of the Friedman chi-squared", {
+  # A corrected chi-squared paired with an uncorrected W is the bug fixed in
+  # 0.2.3: a reader computing chi2 / (n (G - 1)) must recover the reported W.
+  set.seed(31)
+  X <- matrix(sample(1:4, 80 * 6, TRUE, prob = 1:4), 80, 6)
+  Y <- pmax(pmin(X - matrix(stats::rbinom(80 * 6, 1, .4), 80, 6), 4), 1)
+  cp <- pord.compare(X, Y, domain = rep(c("A", "B", "C"), each = 2))
+  n <- cp$n; G <- nrow(cp$domains)
+  expect_equal(cp$kendall.W,
+               as.numeric(cp$friedman$statistic) / (n * (G - 1)),
+               tolerance = 1e-12)
+  # and it equals the tie-corrected closed form
+  Z <- vapply(c("A", "B", "C"), function(b) {
+    j <- rep(c("A", "B", "C"), each = 2) == b
+    rowMeans((Y[, j, drop = FALSE] < X[, j, drop = FALSE]) * 1)
+  }, numeric(nrow(X)))
+  rk <- t(apply(Z, 1, rank))
+  S <- sum((colSums(rk) - n * (G + 1) / 2)^2)
+  TT <- sum(apply(rk, 1, function(r) { u <- as.numeric(table(r)); sum(u^3 - u) }))
+  expect_equal(cp$kendall.W,
+               12 * S / (n^2 * (G^3 - G) - n * TT), tolerance = 1e-10)
+  expect_gte(cp$kendall.W, 0); expect_lte(cp$kendall.W, 1)
+})
+
 test_that("pord.compare returns one row per pair of domains", {
   set.seed(8)
   X <- matrix(sample(1:4, 60 * 6, TRUE, prob = 1:4), 60, 6)

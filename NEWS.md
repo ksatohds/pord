@@ -1,3 +1,18 @@
+# pord 0.2.3 (2026-08-19)
+
+## Bug fix: `pord.compare()` reported Kendall's W without the tie correction
+
+`pord.compare()` took its chi-squared from `stats::friedman.test()`, which
+applies the Kendall-Babington Smith tie correction, but computed Kendall's W
+from the uncorrected formula `12 S / (n^2 (G^3 - G))`.  The two were then
+printed side by side, so a reader recovering W as `chi2 / (n (G - 1))` got a
+different number -- on the study that motivated the package, 0.118 against a
+reported 0.085.
+
+W is now defined as `chi2 / (n (G - 1))`, which equals the tie-corrected
+`12 S / (n^2 (G^3 - G) - n T)`.  A regression test checks both identities.
+**Reported W values increase whenever ties are present.**
+
 # pord 0.2.2 (2026-08-19)
 
 ## Terminology, finished

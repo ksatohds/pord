@@ -21,7 +21,9 @@ and the respondents in the rows are its \code{blocks}.}
 }
 \value{
 A list of class \code{"pord.compare"} with the domain-level
-proportions and mean ranks, the Friedman test and Kendall's W, and a data
+proportions and mean ranks, the Friedman test and Kendall's W (defined as
+\eqn{\chi^2 / (n (G - 1))}, so that it shares the tie correction applied
+by \code{\link[stats:friedman.test]{stats::friedman.test()}}), and a data
 frame of all pairwise sign tests.  Only respondents with complete data on
 every item are used, since the comparison is within respondents.
 }
