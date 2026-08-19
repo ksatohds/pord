@@ -182,7 +182,7 @@ pord.table <- function(x, y = NULL, K = NULL) {
     n = d$n, K = d$K, r = d$r, s = d$s), class = "pord.table")
 }
 
-#' @title Closed-form null moments of the superiority count
+#' @title Closed-form null moments of the y >= x count
 #' @description
 #' \code{pord.moments} returns the mean and variance of
 #' \eqn{T = \#\{i : y_i \ge x_i\}} under independence with both margins fixed.
@@ -247,7 +247,7 @@ pord.moments <- function(x, y = NULL, K = NULL) {
   list(theta = th, mean = n * th, sd = n * sqrt(V), n = n)
 }
 
-#' @title Exact conditional test for paired ordinal superiority
+#' @title Exact conditional test for an excess of y >= x pairs
 #' @description
 #' \code{pord.test} tests whether the number of pairs with \eqn{y \ge x} exceeds
 #' the value expected when \code{x} and \code{y} are independent, conditioning
@@ -375,7 +375,7 @@ pord.test <- function(x, y = NULL, K = NULL,
 
 #' @export
 print.pord.test <- function(x, ...) {
-  cat("\n\tExact conditional test for paired ordinal superiority\n\n")
+  cat("\n\tExact conditional test for an excess of y >= x pairs\n\n")
   cat(sprintf("n = %d, scale points = %d, method = %s%s\n", x$n, x$K, x$method,
               if (!is.na(x$B)) sprintf(" (B = %s)", format(x$B, big.mark = ",")) else ""))
   cat(sprintf("count(y >= x) = %d (%.1f%%); expected under independence %.1f%%; excess %+.1f points\n",

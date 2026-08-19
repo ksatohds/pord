@@ -2,7 +2,7 @@
 % Please edit documentation in R/pord.R
 \name{pord.moments}
 \alias{pord.moments}
-\title{Closed-form null moments of the superiority count}
+\title{Closed-form null moments of the y >= x count}
 \usage{
 pord.moments(x, y = NULL, K = NULL)
 }

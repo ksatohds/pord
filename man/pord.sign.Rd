@@ -30,11 +30,19 @@ at the ceiling.
 }
 \description{
 \code{pord.sign} tests whether \eqn{y} falls below \eqn{x} more often than it
-rises above it, i.e. whether the K x K table is asymmetric about its
-diagonal in the downward direction.  This is the exact conditional test of
-symmetry: conditioning on the off-diagonal pair totals leaves a binomial
-distribution, so the diagonal (ties) drops out and the test is the classical
-sign test.
+rises above it.  Conditioning on the number of discordant pairs leaves a
+binomial distribution, so the diagonal (ties) drops out and the test is the
+classical sign test.
+
+The null it actually tests is \emph{directional balance},
+\eqn{P(Y < X) = P(Y > X)}.  Symmetry of the table (\eqn{\pi_{ij} = \pi_{ji}})
+implies that null but is not implied by it: the test pools every off-diagonal
+cell into two totals, so it is blind to a table in which one pair of cells
+leans one way and another pair leans back.  With \eqn{n_{12} = 30, n_{21} = 0}
+and \eqn{n_{34} = 0, n_{43} = 30} it returns \eqn{p = 1}, while Bowker's test
+of symmetry gives \eqn{p < 10^{-13}}.  Use a Bowker or exact conditional
+symmetry test when symmetry itself is the question; \code{pord.sign} answers
+the directional one.
 
 A ceiling in \code{x} does not bias this test.  The null of symmetry
 implies equal margins for \eqn{x} and \eqn{y}; when \eqn{x} piles up at the

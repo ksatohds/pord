@@ -133,18 +133,34 @@ test_that("the sign test drops ties and matches the classical binomial", {
   expect_equal(s1$p.value, ref, tolerance = 1e-12)
 })
 
-test_that("the sign test holds its level under symmetry, ceiling included", {
-  # X, Y iid from a top-heavy distribution: the joint is symmetric, so the
-  # test must NOT reject at more than its nominal level.  This is the case
-  # that the removed `conditional` variant got wrong (its selection on
-  # 1 < x < K made the discordant probability 0.218, not 0.5).
-  set.seed(22)
-  pr <- c(.05, .15, .35, .45)
-  rej <- mean(replicate(2000, {
-    x <- sample(1:4, 60, TRUE, pr); y <- sample(1:4, 60, TRUE, pr)
+test_that("the sign test holds its level under symmetry, either way up", {
+  # X, Y iid: the joint is symmetric, so the rejection rate must sit AT the
+  # nominal level -- not merely below it.  The removed `conditional` variant
+  # failed by being far too conservative here (its selection on 1 < x < K
+  # made the discordant probability 0.218 rather than 0.5), which an
+  # upper-bound-only assertion would have passed.  Both a top-heavy and a
+  # bottom-heavy scale are checked, since the old error changed sign with the
+  # shape of the margin.
+  for (pr in list(top = c(.05, .15, .35, .45), bottom = c(.45, .35, .15, .05))) {
+    set.seed(22)
+    rej <- mean(replicate(2000, {
+      x <- sample(1:4, 60, TRUE, pr); y <- sample(1:4, 60, TRUE, pr)
+      pord.sign(x, y, K = 4, alternative = "two.sided")$p.value < 0.05
+    }))
+    expect_gt(rej, 0.02)   # not conservative: it must actually reject at 5%
+    expect_lt(rej, 0.08)   # not anticonservative
+  }
+})
+
+test_that("the sign test has power against a real downward shift", {
+  # The mirror of the level test: when y genuinely falls short, it must reject.
+  set.seed(23)
+  rej <- mean(replicate(400, {
+    x <- sample(1:4, 60, TRUE, c(.05, .15, .35, .45))
+    y <- pmax(1L, x - stats::rbinom(60, 1, 0.35))
     pord.sign(x, y, K = 4)$p.value < 0.05
   }))
-  expect_lt(rej, 0.07)   # nominal 5% plus Monte Carlo slack
+  expect_gt(rej, 0.95)
 })
 
 ## ---------------------------------------------------------------------

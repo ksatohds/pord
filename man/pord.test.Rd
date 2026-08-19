@@ -2,7 +2,7 @@
 % Please edit documentation in R/pord.R
 \name{pord.test}
 \alias{pord.test}
-\title{Exact conditional test for paired ordinal superiority}
+\title{Exact conditional test for an excess of y >= x pairs}
 \usage{
 pord.test(
   x,

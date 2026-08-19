@@ -1,3 +1,28 @@
+# pord 0.2.1 (2026-08-19)
+
+## Wording and test coverage
+
+No change to any computed value.
+
+- `pord.sign()` was described as "the exact conditional test of symmetry".
+  It is not: the null it tests is directional balance, `P(Y < X) = P(Y > X)`.
+  Symmetry implies that null but is not implied by it, because the test pools
+  every off-diagonal cell into two totals.  With `n_12 = 30, n_21 = 0` and
+  `n_34 = 0, n_43 = 30` the test returns `p = 1` while Bowker's test of
+  symmetry gives `p < 1e-13`.  The help page now says so and points to a
+  Bowker or exact conditional symmetry test when symmetry is the question.
+- `pord.test()` and `pord.moments()` were titled in terms of "paired ordinal
+  superiority", which reads as stochastic dominance or a comparison of
+  margins.  Both margins are conditioned on, so a marginal shift is not what
+  the test can see; what varies is the pairing.  Retitled around the quantity
+  actually used: an excess of `y >= x` pairs over independence.
+- The level test for `pord.sign()` asserted only that the rejection rate was
+  below 0.07, which a test that never rejects would also pass -- precisely
+  the failure mode of the `conditional` variant removed in 0.2.0.  It now
+  brackets the rate from both sides, on a bottom-heavy scale as well as a
+  top-heavy one, and a companion test checks power against a real downward
+  shift.
+
 # pord 0.2.0 (2026-08-19)
 
 ## Breaking change: `conditional` removed from `pord.sign()` and `pord.items()`

@@ -44,7 +44,7 @@ set.seed(1)
 x <- sample(1:4, 96, TRUE, c(.05, .15, .35, .45))   # expectation
 y <- pmax(1, pmin(4, x - rbinom(96, 1, .35)))       # achievement
 
-pord.test(x, y)            # does achievement reach expectation?
+pord.test(x, y)            # more y >= x pairs than independence gives?
 pord.sign(x, y)            # does achievement fall short of expectation?
 pord.table(x, y)           # the 4 x 4 table split into three regions
 ```
